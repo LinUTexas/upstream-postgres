@@ -1,3 +1,7 @@
 
 .dbeaver/.credentials-config.json.bak
 .dbeaver/.data-sources.json.bak
+*.h5
+scripts/Postgrest/DataCleaning/2023Beaumont_partial/*
+scripts/Postgrest/DataCleaning/Sample Data and Software for TACC/*
+.idea/
