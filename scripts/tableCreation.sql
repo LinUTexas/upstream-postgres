@@ -65,7 +65,6 @@ CREATE TABLE public.measurement (
 	variablename varchar NULL,
 	collectiontime timestamp NULL,
 	variabletype varchar NULL,
-	Geometry point NULL,
 	elevation float4 NULL,
 	measurementvalue float4 NULL,
 	CONSTRAINT fk_sensor
@@ -73,7 +72,7 @@ CREATE TABLE public.measurement (
 	  REFERENCES sensor(sensorid)
 );
 
-
+SELECT AddGeometryColumn ('public','measurement','geometry',4326,'POINT',2);
 
 
 
@@ -108,6 +107,7 @@ grant update  on   public.station to sensor_user;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon;
 grant usage on schema public to sensor_user;
 grant all on public.station to sensor_user;
+grant usage, select on sequence public.measurement_measurementid_seq to sensor_user;
 grant usage, select on sequence public.sensor_sensorid_seq to sensor_user;
 grant usage, select on sequence public.station_stationid_seq to sensor_user;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public to sensor_user;

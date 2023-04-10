@@ -5,3 +5,5 @@
 scripts/Postgrest/DataCleaning/2023Beaumont_partial/*
 scripts/Postgrest/DataCleaning/Sample Data and Software for TACC/*
 .idea/
+scripts/Postgrest/DataCleaning/cleanData/sensor.csv
+scripts/Postgrest/DataCleaning/.env
