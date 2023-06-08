@@ -9,14 +9,14 @@ config = dotenv_values(".env") #apikey
 
 
 class UPStreamLibrary:
-    def __init__(self, api_url="https://postgrest-dev.proudflower-a6582e11.centralus.azurecontainerapps.io"):
+    def __init__(self, sensor_table,api_url="https://postgrest-dev.proudflower-a6582e11.centralus.azurecontainerapps.io"):
         self.api_url = api_url
         self.header = {'Authorization': f'Bearer {config["apikey"]}'}
         self.measurement_df = self.load_table_csv(
             "DataCleaning/cleanData/sensor.csv")
         self.Station_Metadata={}
         # self.station = station
-        # self.sensor_table = sensor_table
+        self.sensor_table = sensor_table
 
     def load_table_csv(self, csv_location):
         return pd.read_csv(csv_location)
@@ -37,7 +37,8 @@ class UPStreamLibrary:
 
 
 if __name__== '__main__':
-    sniffer = UPStreamLibrary(
+    sensor_table = pd.read_csv('DataCleaning/cleanData/sensor.csv')
+    sniffer = UPStreamLibrary(sensor_table,
         api_url="http://postgrest-dev.proudflower-a6582e11.centralus"
                 ".azurecontainerapps.io")
     sniffer.Station_Metadata = {
@@ -56,6 +57,7 @@ if __name__== '__main__':
     # sniffer.POST_table('station', sniffer.Station_Metadata)
     # sniffer.GET_table("station?projectid=eq.SETx-UIFL%20Beaumont&stationname=eq.sniffer_test")
     sniffer.GET_table("sensor?sensorid=eq.1943")
+    sniffer.POST_table('sensor',sniffer.sensor_table)
 
     pass
 #
