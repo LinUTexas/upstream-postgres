@@ -27,9 +27,12 @@ class UPStreamLibrary:
         print(self.data)
         response.raise_for_status()
 
-    def POST_table(self, table_name):
+    def POST_table(self, table_name, data):
         url = f"{self.api_url}/{table_name}"
-        response = requests.post(url, json=self.data)
+        # print(data)
+        response = requests.post( url,
+            headers={'Authorization': f'Bearer {config["apikey"]}',},
+            data=data)
         response.raise_for_status()
 
 
@@ -48,10 +51,11 @@ if __name__== '__main__':
     "datetime": "Feb 25, 2023 12:18:11"
 }
 
-    sniffer.GET_table("station?projectid=eq.SETx-UIFL%20Beaumont&stationname=eq.sniffer")
-    #Post Thee Data
-
-    sniffer.GET_table("station?projectid=eq.SETx-UIFL%20Beaumont&stationname=eq.sniffer_test")
+    # sniffer.GET_table("station?projectid=eq.SETx-UIFL%20Beaumont&stationname=eq.sniffer")
+    #Post The Data
+    # sniffer.POST_table('station', sniffer.Station_Metadata)
+    # sniffer.GET_table("station?projectid=eq.SETx-UIFL%20Beaumont&stationname=eq.sniffer_test")
+    sniffer.GET_table("sensor?sensorid=eq.1943")
 
     pass
 #
