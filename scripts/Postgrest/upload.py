@@ -12,8 +12,8 @@ class UPStreamLibrary:
     def __init__(self, sensor_table,api_url="https://postgrest-dev.proudflower-a6582e11.centralus.azurecontainerapps.io"):
         self.api_url = api_url
         self.header = {'Authorization': f'Bearer {config["apikey"]}'}
-        self.measurement_df = self.load_table_csv(
-            "DataCleaning/cleanData/sensor.csv")
+        self.measurement_table = self.load_table_csv(
+            "DataCleaning/cleanData/measurement.csv")
         self.Station_Metadata={}
         # self.station = station
         self.sensor_table = sensor_table
@@ -30,7 +30,7 @@ class UPStreamLibrary:
     def POST_table(self, table_name, data):
         url = f"{self.api_url}/{table_name}"
         # print(data)
-        response = requests.post( url,
+        response = requests.post(url,
             headers={'Authorization': f'Bearer {config["apikey"]}',},
             data=data)
         response.raise_for_status()
@@ -52,12 +52,17 @@ if __name__== '__main__':
     "datetime": "Feb 25, 2023 12:18:11"
 }
 
+    measurement_table = pd.read_csv('DataCleaning/cleanData/measurement.csv')
+
     # sniffer.GET_table("station?projectid=eq.SETx-UIFL%20Beaumont&stationname=eq.sniffer")
     #Post The Data
     # sniffer.POST_table('station', sniffer.Station_Metadata)
     # sniffer.GET_table("station?projectid=eq.SETx-UIFL%20Beaumont&stationname=eq.sniffer_test")
     sniffer.GET_table("sensor?sensorid=eq.1943")
-    sniffer.POST_table('sensor',sniffer.sensor_table)
+    sniffer.POST_table('sensor',sniffer.sensor_table.to_csv(header=True, index=False))
+
+    measurement_table.GET_table("measurement?sensorid=eq.1952")
+    measurement_table.POST_table('measurement',sniffer.measurement_table.to_csv(header=True, index=False))
 
     pass
 #

@@ -8,3 +8,4 @@ scripts/Postgrest/DataCleaning/Sample Data and Software for TACC/*
 scripts/Postgrest/DataCleaning/cleanData/sensor.csv
 scripts/Postgrest/DataCleaning/.env
 .DS_Store
+*.csv
