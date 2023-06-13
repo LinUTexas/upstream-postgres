@@ -58,11 +58,10 @@ if __name__== '__main__':
     #Post The Data
     # sniffer.POST_table('station', sniffer.Station_Metadata)
     # sniffer.GET_table("station?projectid=eq.SETx-UIFL%20Beaumont&stationname=eq.sniffer_test")
-    sniffer.GET_table("sensor?sensorid=eq.1943")
-    sniffer.POST_table('sensor',sniffer.sensor_table.to_csv(header=True, index=False))
+    # sniffer.GET_table("sensor?sensorid=eq.1943")
+    # sniffer.POST_table('sensor',sniffer.sensor_table.to_csv(header=True, index=False))
 
-    measurement_table.GET_table("measurement?sensorid=eq.1952")
-    measurement_table.POST_table('measurement',sniffer.measurement_table.to_csv(header=True, index=False))
+    # sniffer.POST_table('measurement',sniffer.measurement_table.to_csv(header=True, index=False))
 
     pass
 #
