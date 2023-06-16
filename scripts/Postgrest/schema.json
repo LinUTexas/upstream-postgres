@@ -1,0 +1,15 @@
+[{
+"url":"https://postgrest-dev.proudflower-a6582e11.centralus.azurecontainerapps.io",
+"data_dir":"scripts/Postgrest/DataCleaning/cleanData",
+"metadata":{
+    "stationname":"sniffer",
+    "projectid":"SETx-UIFL Beaumont",
+    "description": "Beaumont Run of the SNIFFER air quality sensor for VOCUS data",
+    "contactname": "Pawell",
+    "contactemail": "Pawell@utexas.edu",
+    "active":"True",
+    "startdate": "Feb 23, 2024 17:05:57",
+    "datetime": "Feb 25, 2023 12:18:11"
+}
+
+}]

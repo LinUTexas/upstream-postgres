@@ -1,80 +1,81 @@
 import os
-
+import json
 import requests
 import pandas as pd
 from dotenv import dotenv_values
-config = dotenv_values(".env") #apikey
+config = dotenv_values("scripts/Postgrest/.env") #apikey
 
-# MassList = pd.read_csv("2023Beaumont_partial/w_data/Export/UL/IonList/MassIDs_2023.02.23-17h36m01sUL.csv")
+with open("scripts/Postgrest/schema.json") as f: 
+    args = json.loads(f.read())[0]
 
 
 class UPStreamLibrary:
-    def __init__(self, sensor_table,api_url="https://postgrest-dev.proudflower-a6582e11.centralus.azurecontainerapps.io"):
+    def __init__(self,data_dir, api_url):
         self.api_url = api_url
         self.header = {'Authorization': f'Bearer {config["apikey"]}'}
-        self.measurement_table = self.load_table_csv(
-            "DataCleaning/cleanData/measurement.csv")
+     
         self.Station_Metadata={}
-        # self.station = station
-        self.sensor_table = sensor_table
+        self.sensor_table = self.load_table_csv(data_dir, "sensor.csv")
+        self.measurement_table = self.load_table_csv(data_dir, "measurement.csv")
 
-    def load_table_csv(self, csv_location):
-        return pd.read_csv(csv_location)
+
+    def load_table_csv(self, csv_dir, csv_file):
+        return pd.read_csv(os.path.join(csv_dir, csv_file))
+    
     def GET_table(self, table_name):
         url = os.path.join(self.api_url, table_name)
         response = requests.get(url)
         self.data = response.json()
-        print(self.data)
+
         response.raise_for_status()
 
+    def UPSERT_table(self, table_name, query_column, id, data):
+        self.GET_table(f"{table_name}?{query_column}=eq.{id}")
+        
+        data[f'{table_name}id'] = (self.data[0])[f'{table_name}id']
+        url = f"{self.api_url}/{table_name}"
+    
+        print(data)
+        response = requests.post(url,
+        headers={'Authorization': f'Bearer {config["apikey"]}',
+                    "Prefer": "resolution=merge-duplicates"},
+        data=data)
+             
     def POST_table(self, table_name, data):
         url = f"{self.api_url}/{table_name}"
-        # print(data)
-        response = requests.post(url,
-            headers={'Authorization': f'Bearer {config["apikey"]}',},
+        if type(data) is dict:
+            print(data)
+            response = requests.post(url,
+            headers={'Authorization': f'Bearer {config["apikey"]}',
+                     "Prefer": "return=representation"},
             data=data)
-        response.raise_for_status()
+        else: 
+            response = requests.post(url,
+            headers={'Authorization': f'Bearer {config["apikey"]}','Content-Type':'text/csv',
+                     "Prefer": "return=representation"},
+            data=data)
+        return response
 
 
 if __name__== '__main__':
-    sensor_table = pd.read_csv('DataCleaning/cleanData/sensor.csv')
-    sniffer = UPStreamLibrary(sensor_table,
-        api_url="http://postgrest-dev.proudflower-a6582e11.centralus"
-                ".azurecontainerapps.io")
-    sniffer.Station_Metadata = {
-    "stationname":"sniffer_test",
-    "projectid":"SETx-UIFL Beaumont",
-    "description": "Beaumont Run of the SNIFFER air quality sensor for VOCUS data",
-    "contactname": "Pawell",
-    "contactemail": "Pawell@utexas.edu",
-    "active":True,
-    "startdate": "Feb 23, 2023 17:05:57",
-    "datetime": "Feb 25, 2023 12:18:11"
-}
+    print(os.getcwd())
+   
+    sniffer = UPStreamLibrary(data_dir=args['data_dir'],
+        api_url=args['url'])
+    
+    sniffer.Station_Metadata = args['metadata']
 
-    measurement_table = pd.read_csv('DataCleaning/cleanData/measurement.csv')
+    sniffer.UPSERT_table('station','projectid', "SETx-UIFL Beaumont", sniffer.Station_Metadata)
 
-    # sniffer.GET_table("station?projectid=eq.SETx-UIFL%20Beaumont&stationname=eq.sniffer")
-    #Post The Data
-    # sniffer.POST_table('station', sniffer.Station_Metadata)
-    # sniffer.GET_table("station?projectid=eq.SETx-UIFL%20Beaumont&stationname=eq.sniffer_test")
-    # sniffer.GET_table("sensor?sensorid=eq.1943")
-    # sniffer.POST_table('sensor',sniffer.sensor_table.to_csv(header=True, index=False))
+    for m in sniffer.sensor_table['alias'].tolist():
+        print(m)
+        sniffer.measurement_table['measurementvalue'] = sniffer.measurement_table[f'{m}']
+        data = sniffer.POST_table('sensor', sniffer.sensor_table.loc[sniffer.sensor_table['alias']==m].to_dict("records")[0])
+        sniffer.measurement_table['sensorid'] = json.loads(data.text)[0]['sensorid']
 
-    # sniffer.POST_table('measurement',sniffer.measurement_table.to_csv(header=True, index=False))
+        data = sniffer.POST_table('measurement?select=collectiontime,geometry,measurementvalue,sensorid',
+                                   sniffer.measurement_table[['sensorid','collectiontime', 'geometry', 'measurementvalue'  ]].to_csv(header=True, index=False)
+        )
+        
 
-    pass
-#
-# def upload_table(self):
-#     self.store_table()
-#
-#
-# def upload_csv(self, "2023Beaumont_partial/w_data/Export/UL/IonList/MassIDs_2023.02.23-17h36m01sUL.csv"):
-#     df = pd.read_csv(("2023Beaumont_partial/w_data/Export/UL/IonList/MassIDs_2023.02.23-17h36m01sUL.csv")
-#     self.data = df.to_dict(orient='records')
-#     self.store_table()
-#
-#
-# def open_csv(self, "2023Beaumont_partial/w_data/Export/UL/IonList/MassIDs_2023.02.23-17h36m01sUL.csv"):
-#     df = pd.read_csv(("2023Beaumont_partial/w_data/Export/UL/IonList/MassIDs_2023.02.23-17h36m01sUL.csv")
-#     self.data = df.to_dict(orient='records')
+    
