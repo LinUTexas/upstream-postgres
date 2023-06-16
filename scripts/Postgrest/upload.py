@@ -5,7 +5,7 @@ import pandas as pd
 from dotenv import dotenv_values
 config = dotenv_values("scripts/Postgrest/.env") #apikey
 
-with open("scripts/Postgrest/schema.json") as f: 
+with open("scripts/Postgrest/DataCleaning/cleanData/schema.json") as f: 
     args = json.loads(f.read())[0]
 
 
